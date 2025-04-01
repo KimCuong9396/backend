@@ -32,11 +32,13 @@ connectDB();
 const auth = require("./routes/authRoutes");
 const flashCards = require("./routes/flashCardRoutes");
 const words = require("./routes/wordRoutes");
+const progressRoutes = require("./routes/progressRoutes");
+const reviseRoutes = require("./routes/reviseRoutes");
 const app = express();
 // Cấu hình CORS
 app.use(
   cors({
-    origin: "http://localhost:5181", // Cho phép frontend gọi API
+    origin: "http://localhost:5173", // Cho phép frontend gọi API
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -57,6 +59,8 @@ if (process.env.NODE_ENV === "development") {
 app.use("/api/auth", auth);
 app.use("/api/words", words);
 app.use("/api/flashCards", flashCards);
+app.use("/api/progress", progressRoutes);
+app.use("/api/vocabulary", reviseRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;

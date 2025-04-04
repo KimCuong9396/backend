@@ -8,5 +8,4 @@ const wordSchema = new mongoose.Schema({
   example: { type: String, required: true },
 });
 
-const Word = mongoose.model("Word", wordSchema);
-module.exports = Word;
+module.exports = mongoose.model("Word", wordSchema);

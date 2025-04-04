@@ -1,33 +1,46 @@
 const jwt = require("jsonwebtoken");
-const asyncHandler = require("./async");
-const ErrorResponse = require("../utils/errorResponse");
-const User = require("../models/User");
 
-// Protect routes
-exports.protect = asyncHandler(async (req, res, next) => {
-  let token;
+module.exports = function (req, res, next) {
+  // Lấy token từ header
+  const authHeader = req.header("Authorization");
+  const token = authHeader && authHeader.split(" ")[1];
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    // Set token from Bearer token in header
-    token = req.headers.authorization.split(" ")[1];
-  }
-
-  // Make sure token exists
+  // Kiểm tra nếu không có token
   if (!token) {
-    return next(new ErrorResponse("Not authorized to access this route", 401));
+    return res
+      .status(401)
+      .json({ message: "Không có token, xác thực thất bại" });
   }
 
+  // Verify token
   try {
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    req.user = await User.findById(decoded.id);
-
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "your_jwt_secret"
+    );
+    req.user = decoded;
     next();
   } catch (err) {
-    return next(new ErrorResponse("Not authorized to access this route", 401));
+    res.status(403).json({ message: "Token không hợp lệ" });
   }
-});
+};
+// const jwt = require("jsonwebtoken");
+
+// const authMiddleware = (req, res, next) => {
+//   const token = req.header("Authorization")?.replace("Bearer ", "");
+//   if (!token)
+//     return res.status(401).json({ message: "Không có quyền truy cập" });
+
+//   try {
+//     const decoded = jwt.verify(
+//       token,
+//       process.env.JWT_SECRET || "your_jwt_secret"
+//     );
+//     req.user = decoded;
+//     next();
+//   } catch (err) {
+//     res.status(401).json({ message: "Token không hợp lệ" });
+//   }
+// };
+
+// module.exports = authMiddleware;
